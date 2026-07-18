@@ -3,10 +3,11 @@ import serverless from 'serverless-http';
 import https from 'https';
 
 const app = express();
+const router = express.Router();
 
 app.use(express.json());
 
-app.get('/api/proxy-json', async (req, res) => {
+router.get('/proxy-json', async (req, res) => {
   const jsonUrl = req.query.url;
   if (!jsonUrl || typeof jsonUrl !== 'string') {
     return res.status(400).json({ error: 'Missing or invalid "url" query parameter' });
@@ -75,7 +76,7 @@ app.get('/api/proxy-json', async (req, res) => {
   }
 });
 
-app.get('/api/proxy-xlsx', async (req, res) => {
+router.get('/proxy-xlsx', async (req, res) => {
   const xlsxUrl = req.query.url;
   if (!xlsxUrl || typeof xlsxUrl !== 'string') {
     return res.status(400).json({ error: 'Missing or invalid "url" query parameter' });
@@ -143,5 +144,8 @@ app.get('/api/proxy-xlsx', async (req, res) => {
     }
   }
 });
+
+app.use('/api', router);
+app.use('/.netlify/functions/api', router);
 
 export const handler = serverless(app);
